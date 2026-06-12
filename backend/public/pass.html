@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Passora — Mon Pass</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #050810;
+      --card: #111827;
+      --border: rgba(255,255,255,0.07);
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --green: #10b981;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59,130,246,0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* PASS CARD */
+    .pass-card {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+      margin-bottom: 20px;
+      animation: slideUp 0.5s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pass-header {
+      padding: 28px 28px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pass-header::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 150px; height: 150px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .pass-header::after {
+      content: '';
+      position: absolute;
+      bottom: -20px; left: -20px;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .pass-business {
+      font-size: 0.78rem;
+      opacity: 0.7;
+      font-weight: 300;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .pass-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .pass-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.15);
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .pass-body {
+      background: var(--card);
+      padding: 28px;
+    }
+
+    .pass-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+      font-weight: 300;
+    }
+
+    /* QR CODE */
+    .qr-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+      background: white;
+      border-radius: 16px;
+      margin-bottom: 20px;
+    }
+
+    .qr-section img {
+      width: 180px;
+      height: 180px;
+    }
+
+    .qr-label {
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .pass-id {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 4px;
+    }
+
+    /* INFO ROWS */
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+
+    .info-row:last-child { border-bottom: none; }
+
+    .info-label { color: var(--muted); font-weight: 300; }
+    .info-value { font-weight: 500; }
+    .info-value.green { color: var(--green); }
+
+    /* WALLET BUTTONS */
+    .wallet-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .wallet-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .wallet-btn.google {
+      background: #4285f4;
+      color: white;
+    }
+
+    .wallet-btn.google:hover {
+      background: #3574e2;
+      transform: translateY(-1px);
+    }
+
+    .wallet-btn.apple {
+      background: #000;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .wallet-btn.apple:hover {
+      background: #1a1a1a;
+      transform: translateY(-1px);
+    }
+
+    /* FOOTER */
+    .pass-footer {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .pass-footer a {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+    }
+
+    .pass-footer p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* LOADING */
+    .loading {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ERROR */
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .error-icon { font-size: 3rem; margin-bottom: 16px; }
+    .error-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .error-desc { color: var(--muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <p style="color: var(--muted)">Chargement du pass...</p>
+  </div>
+
+  <div id="passContent" style="display:none">
+    <!-- Pass Card -->
+    <div class="pass-card">
+      <div class="pass-header" id="passHeader">
+        <div class="pass-business" id="passBusiness"></div>
+        <div class="pass-name" id="passName"></div>
+        <div class="pass-type-badge" id="passTypeBadge"></div>
+      </div>
+      <div class="pass-body">
+        <p class="pass-desc" id="passDesc"></p>
+
+        <div class="qr-section">
+          <img id="qrCode" src="" alt="QR Code"/>
+          <div class="qr-label">Présentez ce QR code en caisse</div>
+          <div class="pass-id" id="passId"></div>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Statut</span>
+          <span class="info-value green">✓ Actif</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Type</span>
+          <span class="info-value" id="passTypeInfo"></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Émis par</span>
+          <span class="info-value" id="passIssuer"></span>
+        </div>
+
+        <div class="wallet-buttons">
+          <button class="wallet-btn google" onclick="addToGoogle()">
+            <span>📱</span> Ajouter à Google Wallet
+          </button>
+          <button class="wallet-btn apple" onclick="addToApple()">
+            <span>🍎</span> Ajouter à Apple Wallet
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pass-footer">
+      <a href="index.html">Passora</a>
+      <p>Passes numériques pour l'Algérie 🇩🇿</p>
+    </div>
+  </div>
+
+  <div id="errorState" class="error-state" style="display:none">
+    <div class="error-icon">😕</div>
+    <div class="error-title">Pass introuvable</div>
+    <div class="error-desc">Ce pass n'existe pas ou a été supprimé.</div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+
+  const typeEmojis = {
+    loyalty: '🏆', coupon: '🎟️', ticket: '🎫', membership: '💎', generic: '📋'
+  };
+
+  const typeLabels = {
+    loyalty: 'Carte de Fidélité', coupon: 'Coupon / Réduction',
+    ticket: 'Billet / Événement', membership: 'Carte Membre', generic: 'Pass Générique'
+  };
+
+  async function loadPass() {
+    const params = new URLSearchParams(window.location.search);
+    const link = window.location.pathname.split('/').pop();
+
+    if (!link) {
+      showError();
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/passes/public/${link}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        showError();
+        return;
+      }
+
+      const pass = data.pass;
+
+      // Style header
+      document.getElementById('passHeader').style.background =
+        `linear-gradient(135deg, ${pass.background_color}, ${pass.background_color}cc)`;
+      document.getElementById('passHeader').style.color = pass.text_color;
+
+      // Fill data
+      document.getElementById('passBusiness').textContent = pass.business_name;
+      document.getElementById('passName').textContent = pass.name;
+      document.getElementById('passTypeBadge').textContent =
+        (typeEmojis[pass.type] || '📋') + ' ' + (typeLabels[pass.type] || pass.type);
+      document.getElementById('passDesc').textContent =
+        pass.description || 'Présentez ce pass à notre équipe pour bénéficier de vos avantages.';
+      document.getElementById('passId').textContent = '#' + pass.unique_link.toUpperCase();
+      document.getElementById('passTypeInfo').textContent = typeLabels[pass.type] || pass.type;
+      document.getElementById('passIssuer').textContent = pass.business_name;
+
+      // QR Code
+      if (pass.qr_code_url) {
+        document.getElementById('qrCode').src = pass.qr_code_url;
+      }
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('passContent').style.display = 'block';
+
+    } catch (err) {
+      showError();
+    }
+  }
+
+  function showError() {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('errorState').style.display = 'block';
+  }
+
+  function addToGoogle() {
+    alert('🚀 Intégration Google Wallet — Bientôt disponible sur Passora !');
+  }
+
+  function addToApple() {
+    alert('🍎 Intégration Apple Wallet — Bientôt disponible sur Passora !');
+  }
+
+  loadPass();
+</script>
+</body>
+</html>
